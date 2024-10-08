@@ -21,11 +21,6 @@ on:
         description: 'AWS region for ECR publishing'
         required: false
         default: 'eu-west-1'
-      tag_latest:
-        type: boolean
-        description: 'Whether to tag the Docker image as latest and push it'
-        required: false
-        default: false
     secrets:
       ecr_aws_access_key_id:
         description: 'AWS access key for ECR publishing'
