@@ -55,6 +55,7 @@ jobs:
   build:
     name: 🛠 Build Docker Image
     runs-on: ubuntu-latest
+    needs: [lint, test]
     services:
       docker:
         image: docker:${{ env.DOCKER_VERSION }}
@@ -70,6 +71,7 @@ jobs:
         run: |
           docker save ${{ inputs.docker_image }}:${{ inputs.image_tag }} -o myapp.tar
         # Upload the Docker image tarball as an artifact
+      - name: Upload Docker Image Artifact
         uses: actions/upload-artifact@v3
         with:
           name: docker-image
