@@ -31,8 +31,6 @@ jobs:
     name: 🔐 Security Scan
     if: ${{ inputs.security_scan_enabled == 'true' }}
     runs-on: ubuntu-latest
-    env:
-      TRIVY_VERSION: ${{ env.TRIVY_VERSION }}
     steps:
       - name: Download Docker Image
         uses: actions/download-artifact@v3
@@ -44,8 +42,8 @@ jobs:
 
       - name: Install Trivy
         run: |
-          wget https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
-          tar zxvf trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
+          wget https://github.com/aquasecurity/trivy/releases/download/v${{ env.TRIVY_VERSION }}/trivy_${{ env.TRIVY_VERSION }}_Linux-64bit.tar.gz
+          tar zxvf trivy_${{ env.TRIVY_VERSION }}_Linux-64bit.tar.gz
 
       - name: Run Security Scan on Docker Image
         run: |
@@ -61,8 +59,6 @@ jobs:
     name: 📜 License Scan
     if: ${{ inputs.license_scan_enabled == 'true' }}
     runs-on: ubuntu-latest
-    env:
-      TRIVY_VERSION: ${{ env.TRIVY_VERSION }}
     steps:
       - name: Download Docker Image
         uses: actions/download-artifact@v3
@@ -74,8 +70,8 @@ jobs:
 
       - name: Install Trivy
         run: |
-          wget https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
-          tar zxvf trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
+          wget https://github.com/aquasecurity/trivy/releases/download/v${{ env.TRIVY_VERSION }}/trivy_${{ env.TRIVY_VERSION }}_Linux-64bit.tar.gz
+          tar zxvf trivy_${{ env.TRIVY_VERSION }}_Linux-64bit.tar.gz
 
       - name: Run License Scan on Docker Image
         run: |
