@@ -1,0 +1,83 @@
+# .github/workflows/publish-ecr.yaml
+name: Publish Docker Image to ECR
+
+on:
+  workflow_call:
+    inputs:
+      docker_image:
+        type: string
+        description: 'Docker image name with tag for publishing'
+        required: true
+      image_tag:
+        type: string
+        description: 'Image tag for the Docker image'
+        required: true
+      ecr_repository:
+        type: string
+        description: 'ECR repository for publishing'
+        required: false
+      aws_region:
+        type: string
+        description: 'AWS region for ECR publishing'
+        required: false
+        default: 'eu-west-1'
+      tag_latest:
+        type: boolean
+        description: 'Whether to tag the Docker image as latest and push it'
+        required: false
+        default: false
+    secrets:
+      ecr_aws_access_key_id:
+        description: 'AWS access key for ECR publishing'
+        required: false
+      ecr_aws_secret_access_key:
+        description: 'AWS secret key for ECR publishing'
+        required: false
+
+jobs:
+  publish:
+    name: 🚀 Publish Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Docker Image
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-image
+
+      - name: Load Docker Image
+        run: docker load -i myapp.tar
+
+      - name: Configure AWS for ECR
+        if: ${{ inputs.ecr_repository }}
+        run: |
+          aws configure set aws_access_key_id ${{ inputs.ecr_aws_access_key_id }}
+          aws configure set aws_secret_access_key ${{ inputs.ecr_aws_secret_access_key }}
+          aws ecr get-login-password --region ${{ inputs.aws_region }} | docker login --username AWS --password-stdin ${{ inputs.ecr_repository }}
+
+      - name: Push Docker Image to ECR
+        if: ${{ inputs.ecr_repository }}
+        run: |
+          docker tag ${{ inputs.docker_image }}:${{ inputs.image_tag }} ${{ inputs.ecr_repository }}:${{ inputs.image_tag }}
+          docker push ${{ inputs.ecr_repository }}:${{ inputs.image_tag }}
+
+      - name: Push Docker Image to DockerHub
+        if: ${{ !inputs.ecr_repository }}
+        run: docker push ${{ inputs.docker_image }}:${{ inputs.image_tag }}
+
+  publish_latest:
+    name: 🏷️ Publish Latest Docker Image Tag
+    if: ${{ inputs.tag_latest == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Docker Image
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-image
+
+      - name: Load Docker Image
+        run: docker load -i myapp.tar
+
+      - name: Publish Docker Image with Tag
+        run: |
+          docker tag ${{ inputs.docker_image }}:${{ inputs.image_tag }} ${{ inputs.docker_image }}:latest
+          docker push ${{ inputs.docker_image }}:latest

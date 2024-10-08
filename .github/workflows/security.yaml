@@ -1,0 +1,84 @@
+# .github/workflows/security.yml
+name: Security and License Scan
+
+env:
+  TRIVY_VERSION: 0.47.0
+
+on:
+  workflow_call:
+    inputs:
+      docker_image:
+        type: string
+        description: 'Docker image name with tag for scanning'
+        required: true
+      image_tag:
+        type: string
+        description: 'Image tag for the Docker image'
+        required: true
+      security_scan_enabled:
+        type: boolean
+        description: 'Enable security scanning'
+        required: false
+        default: true
+      license_scan_enabled:
+        type: boolean
+        description: 'Enable license scanning'
+        required: false
+        default: true
+
+jobs:
+  security_scan:
+    name: 🔐 Security Scan
+    if: ${{ inputs.security_scan_enabled == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Docker Image
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-image
+
+      - name: Load Docker Image
+        run: docker load -i myapp.tar
+
+      - name: Install Trivy
+        run: |
+          wget https://github.com/aquasecurity/trivy/releases/download/v${{ env.TRIVY_VERSION }}/trivy_${{ env.TRIVY_VERSION }}_Linux-64bit.tar.gz
+          tar zxvf trivy_${{ env.TRIVY_VERSION }}_Linux-64bit.tar.gz
+
+      - name: Run Security Scan on Docker Image
+        run: |
+          ./trivy image --severity HIGH,CRITICAL --no-progress --format json -o vulnerability.json ${{ inputs.docker_image }}:${{ inputs.image_tag }}
+
+      - name: Upload Vulnerability Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: vulnerability-report
+          path: vulnerability.json
+
+  license_scan:
+    name: 📜 License Scan
+    if: ${{ inputs.license_scan_enabled == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Docker Image
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-image
+
+      - name: Load Docker Image
+        run: docker load -i myapp.tar
+
+      - name: Install Trivy
+        run: |
+          wget https://github.com/aquasecurity/trivy/releases/download/v${{ env.TRIVY_VERSION }}/trivy_${{ env.TRIVY_VERSION }}_Linux-64bit.tar.gz
+          tar zxvf trivy_${{ env.TRIVY_VERSION }}_Linux-64bit.tar.gz
+
+      - name: Run License Scan on Docker Image
+        run: |
+          ./trivy image --scanners license --severity UNKNOWN,HIGH,CRITICAL --no-progress --format json -o license.json ${{ inputs.docker_image }}:${{ inputs.image_tag }}
+
+      - name: Upload License Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: license-report
+          path: license.json

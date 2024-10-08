@@ -1,0 +1,76 @@
+# .github/workflows/build-env.yaml
+name: Lint, Test, and Build Docker Image
+
+env:
+  DOCKER_VERSION: 24.0.2-dind
+
+on:
+  workflow_call:
+    inputs:
+      build_step:
+        description: 'Custom build step command'
+        type: string
+        required: false
+        default: 'echo "Build step is not configured!"'
+      lint_step:
+        description: 'Custom lint step command'
+        type: string
+        required: false
+        default: 'echo "Lint step is not configured!"'
+      test_step:
+        type: string
+        description: 'Custom test step command'
+        required: false
+        default: 'echo "Test step is not configured!"'
+      docker_image:
+        type: string
+        description: 'Docker image name with tag for scanning and publishing'
+        required: true
+      image_tag:
+        type: string
+        description: 'Image tag for tagging and publishing'
+        required: true
+
+jobs:
+  lint:
+    name: 🔍 Lint Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Run Lint Step
+        run: ${{ inputs.lint_step }}
+
+  test:
+    name: 🧪 Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Run Test Step
+        run: ${{ inputs.test_step }}
+
+  build:
+    name: 🛠 Build Docker Image
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:${{ env.DOCKER_VERSION }}
+        options: --privileged
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Build Docker Image
+        run: ${{ inputs.build_step }}
+
+      - name: Save Docker Image to Artifact
+        run: |
+          docker save ${{ inputs.docker_image }}:${{ inputs.image_tag }} -o myapp.tar
+        # Upload the Docker image tarball as an artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-image
+          path: myapp.tar

@@ -1,0 +1,95 @@
+# .github/workflows/deploy-env.yaml
+name: Deploy Image Tag to SVIEW
+
+env:
+  SVIEW_TAG_VERSION: v0.0.5-13-ge0ef33b
+
+on:
+  workflow_call:
+    inputs:
+      docker_image:
+        type: string
+        description: 'Docker image name with tag for publishing'
+        required: true
+      image_tag:
+        type: string
+        description: 'Image tag for the Docker image'
+        required: true
+      sview_app:
+        type: string
+        description: 'SVIEW App name'
+        required: true
+
+jobs:
+  publish:
+    name: 🚀 Publish Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Docker Image
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-image
+
+      - name: Load Docker Image
+        run: docker load -i myapp.tar
+
+      - name: Configure AWS for ECR
+        if: ${{ inputs.ecr_repository }}
+        run: |
+          aws configure set aws_access_key_id ${{ inputs.ecr_aws_access_key_id }}
+          aws configure set aws_secret_access_key ${{ inputs.ecr_aws_secret_access_key }}
+          aws ecr get-login-password --region ${{ inputs.aws_region }} | docker login --username AWS --password-stdin ${{ inputs.ecr_repository }}
+
+      - name: Push Docker Image to ECR
+        if: ${{ inputs.ecr_repository }}
+        run: |
+          docker tag ${{ inputs.docker_image }}:${{ inputs.image_tag }} ${{ inputs.ecr_repository }}:${{ inputs.image_tag }}
+          docker push ${{ inputs.ecr_repository }}:${{ inputs.image_tag }}
+
+      - name: Push Docker Image to DockerHub
+        if: ${{ !inputs.ecr_repository }}
+        run: docker push ${{ inputs.docker_image }}:${{ inputs.image_tag }}
+
+  publish_latest:
+    name: 🏷️ Publish Latest Docker Image Tag
+    if: ${{ inputs.tag_latest == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Docker Image
+        uses: actions/download-artifact@v3
+        with:
+          name: docker-image
+
+      - name: Load Docker Image
+        run: docker load -i myapp.tar
+
+      - name: Publish Docker Image with Tag
+        run: |
+          docker tag ${{ inputs.docker_image }}:${{ inputs.image_tag }} ${{ inputs.docker_image }}:latest
+          docker push ${{ inputs.docker_image }}:latest
+
+  tag_sview:
+    name: 🚀 Tag SVIEW
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Download vulnerability report
+        uses: actions/download-artifact@v4
+        with:
+          name: vulnerability-report
+          path: .
+
+      - name: Tag SVIEW
+        env:
+          SVIEW_APP: ${{ inputs.sview_app }}
+          SVIEW_URL: ${{ vars.SVIEW_URL }}
+          SVIEW_TOKEN: ${{ secrets.SVIEW_TOKEN }}
+          SVIEW_IMAGE: "cto2b/sview-tag:${{ env.SVIEW_TAG_VERSION }}"
+          MODIFIED_VALUES: "image.tag=${{ inputs.image_tag }},github.actor=${{ github.actor }}"
+          VULNERABILITY_FILE: "vulnerability-report.json"
+        run: |
+          echo "SVIEW_IMAGE=${SVIEW_IMAGE}" # Debugging line
+          echo "MODIFIED_VALUES=${MODIFIED_VALUES}" # Debugging line
+          docker run --rm -e MODIFIED_VALUES=${MODIFIED_VALUES} -e SVIEW_TOKEN=${{ secrets.SVIEW_TOKEN }} -e SVIEW_APP=${SVIEW_APP} -e SVIEW_URL=${SVIEW_URL} -e VULNERABILITY_FILE=${VULNERABILITY_FILE} -v ${{ github.workspace }}:/app_origin ${SVIEW_IMAGE} python /app/pipeline.py "/app_origin/${VULNERABILITY_FILE}"
