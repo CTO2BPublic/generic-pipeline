@@ -1,9 +1,6 @@
 # .github/workflows/build-env.yaml
 name: Lint, Test, and Build Docker Image
 
-env:
-  DOCKER_VERSION: 24.0.2-dind
-
 on:
   workflow_call:
     inputs:
@@ -58,7 +55,7 @@ jobs:
     needs: [lint, test]
     services:
       docker:
-        image: docker:${{ env.DOCKER_VERSION }}
+        image: docker:24.0.2-dind
         options: --privileged
     steps:
       - name: Checkout Repository
