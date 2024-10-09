@@ -16,15 +16,15 @@ on:
         description: 'Image tag for the Docker image'
         required: true
       security_scan_enabled:
-        type: boolean
+        type: string
         description: 'Enable security scanning'
         required: false
-        default: true
+        default: 'true'
       license_scan_enabled:
-        type: boolean
+        type: string
         description: 'Enable license scanning'
         required: false
-        default: true
+        default: 'true'
 
 jobs:
   security_scan:
@@ -82,3 +82,10 @@ jobs:
         with:
           name: license-report
           path: license.json
+  
+  mock_step:
+    name: Mock Step
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mock Step
+        run: echo "Mock step to success Security!"
