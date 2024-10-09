@@ -20,6 +20,14 @@ on:
         type: string
         description: 'SVIEW App name'
         required: true
+      sview_url:
+        type: string
+        description: 'SVIEW URL'
+        required: true
+    secrets:
+      sview_token:
+        description: 'SVIEW token'
+        required: true
 
 jobs:
   tag_sview:
@@ -36,8 +44,8 @@ jobs:
       - name: Tag SVIEW
         env:
           SVIEW_APP: ${{ inputs.sview_app }}
-          SVIEW_URL: ${{ vars.SVIEW_URL }}
-          SVIEW_TOKEN: ${{ secrets.SVIEW_TOKEN }}
+          SVIEW_URL: ${{ inputs.sview_url }}
+          SVIEW_TOKEN: ${{ secrets.sview_token }}
           SVIEW_IMAGE: "cto2b/sview-tag:${{ env.SVIEW_TAG_VERSION }}"
           MODIFIED_VALUES: "image.tag=${{ inputs.image_tag }},github.actor=${{ github.actor }}"
           VULNERABILITY_FILE: "vulnerability-report.json"
