@@ -88,4 +88,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Mock Step
-        run: echo "Mock step to success Security!"
+        run: echo "Mock step to success Security ${{ inputs.docker_image }}:${{ inputs.image_tag }}!"
