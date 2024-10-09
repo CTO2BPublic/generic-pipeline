@@ -63,7 +63,8 @@ jobs:
         run: |
           wget https://github.com/aquasecurity/trivy/releases/download/v${{ env.TRIVY_VERSION }}/trivy_${{ env.TRIVY_VERSION }}_Linux-64bit.tar.gz -O trivy.tar.gz
           mkdir -p trivy
-          tar zxvf trivy.tar.gz -C trivy --strip-components=1
+          mv trivy.tar.gz trivy/
+          tar zxvf trivy.tar.gz
 
       - name: Cache Trivy after download
         if: steps.cache-trivy.outputs.cache-hit != 'true'
@@ -122,7 +123,8 @@ jobs:
         run: |
           wget https://github.com/aquasecurity/trivy/releases/download/v${{ env.TRIVY_VERSION }}/trivy_${{ env.TRIVY_VERSION }}_Linux-64bit.tar.gz -O trivy.tar.gz
           mkdir -p trivy
-          tar zxvf trivy.tar.gz -C trivy --strip-components=1
+          mv trivy.tar.gz trivy/
+          tar zxvf trivy.tar.gz
 
       - name: Cache Trivy after download
         if: steps.cache-trivy.outputs.cache-hit != 'true'
