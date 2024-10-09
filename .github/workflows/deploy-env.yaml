@@ -26,8 +26,6 @@ jobs:
     name: 🚀 Tag SVIEW
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
 
       - name: Download vulnerability report
         uses: actions/download-artifact@v4
@@ -35,6 +33,7 @@ jobs:
           name: vulnerability-report
 
       - name: Tag SVIEW
+        continue-on-error: true
         env:
           SVIEW_APP: ${{ inputs.sview_app }}
           SVIEW_URL: ${{ vars.SVIEW_URL }}
@@ -45,4 +44,8 @@ jobs:
         run: |
           echo "SVIEW_IMAGE=${SVIEW_IMAGE}" # Debugging line
           echo "MODIFIED_VALUES=${MODIFIED_VALUES}" # Debugging line
+          if [[ ! -f "${VULNERABILITY_FILE}" ]]; then
+            echo "Vulnerability file not found"
+            touch "${VULNERABILITY_FILE}"
+          fi
           docker run --rm -e MODIFIED_VALUES=${MODIFIED_VALUES} -e SVIEW_TOKEN=${{ secrets.SVIEW_TOKEN }} -e SVIEW_APP=${SVIEW_APP} -e SVIEW_URL=${SVIEW_URL} -e VULNERABILITY_FILE=${VULNERABILITY_FILE} -v ${{ github.workspace }}:/app_origin ${SVIEW_IMAGE} python /app/pipeline.py "/app_origin/${VULNERABILITY_FILE}"

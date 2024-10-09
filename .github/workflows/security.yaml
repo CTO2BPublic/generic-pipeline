@@ -39,7 +39,7 @@ jobs:
     continue-on-error: ${{ inputs.continue_on_error }}
     steps:
       - name: Download Docker Image
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: docker-image
 
@@ -91,6 +91,7 @@ jobs:
         with:
           name: vulnerability-report
           path: vulnerability.json
+          retention-days: 5
 
   license_scan:
     name: 📜 License Scan
@@ -151,6 +152,7 @@ jobs:
         with:
           name: license-report
           path: license.json
+          retention-days: 5
   
   mock_step:
     name: Mock Step
