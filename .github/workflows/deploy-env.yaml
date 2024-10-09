@@ -29,11 +29,11 @@ jobs:
 
       - name: Download vulnerability report
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: vulnerability-report
 
       - name: Tag SVIEW
-        continue-on-error: true
         env:
           SVIEW_APP: ${{ inputs.sview_app }}
           SVIEW_URL: ${{ vars.SVIEW_URL }}
