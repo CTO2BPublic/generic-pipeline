@@ -87,7 +87,7 @@ jobs:
           ./trivy/trivy image --severity HIGH,CRITICAL --no-progress --format json -o vulnerability.json ${{ inputs.docker_image }}:${{ inputs.image_tag }}
 
       - name: Upload Vulnerability Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: vulnerability-report
           path: vulnerability.json
@@ -99,7 +99,7 @@ jobs:
     continue-on-error: ${{ inputs.continue_on_error }}
     steps:
       - name: Download Docker Image
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: docker-image
 
@@ -128,7 +128,7 @@ jobs:
 
       - name: Cache Trivy after download
         if: steps.cache-trivy.outputs.cache-hit != 'true'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: trivy
           key: ${{ env.trivy-cache-key }}
@@ -147,7 +147,7 @@ jobs:
           ./trivy/trivy image --scanners license --severity UNKNOWN,HIGH,CRITICAL --no-progress --format json -o license.json ${{ inputs.docker_image }}:${{ inputs.image_tag }}
 
       - name: Upload License Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: license-report
           path: license.json
