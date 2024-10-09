@@ -45,8 +45,8 @@ jobs:
       - name: Configure AWS for ECR
         if: ${{ inputs.ecr_repository }}
         run: |
-          aws configure set aws_access_key_id ${{ inputs.ecr_aws_access_key_id }}
-          aws configure set aws_secret_access_key ${{ inputs.ecr_aws_secret_access_key }}
+          aws configure set aws_access_key_id ${{ secrets.ecr_aws_access_key_id }}
+          aws configure set aws_secret_access_key ${{ secrets.ecr_aws_secret_access_key }}
           aws ecr get-login-password --region ${{ inputs.aws_region }} | docker login --username AWS --password-stdin ${{ inputs.ecr_repository }}
 
       - name: Push Docker Image to ECR
