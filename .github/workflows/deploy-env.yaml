@@ -49,13 +49,13 @@ jobs:
           SVIEW_TOKEN: ${{ secrets.sview_token }}
           SVIEW_IMAGE: "cto2b/sview-tag:${{ env.SVIEW_TAG_VERSION }}"
           MODIFIED_VALUES: "image.tag=${{ inputs.image_tag }},github.actor=${{ github.actor }}"
-          VULNERABILITY_FILE: "vulnerability-report.json"
+          VULNERABILITY_FILE: "vulnerability.json"
         run: |
           echo "SVIEW_IMAGE=${SVIEW_IMAGE}" # Debugging line
           echo "MODIFIED_VALUES=${MODIFIED_VALUES}" # Debugging line
           ls -la
-          if [[ ! -f "./vulnerability-report.json" ]]; then
+          if [[ ! -f "./vulnerability.json" ]]; then
             echo "Vulnerability file not found"
-            touch "./vulnerability-report.json"
+            touch "./vulnerability.json"
           fi
-          docker run --rm -e MODIFIED_VALUES=${MODIFIED_VALUES} -e SVIEW_TOKEN=${{ secrets.SVIEW_TOKEN }} -e SVIEW_APP=${SVIEW_APP} -e SVIEW_URL=${SVIEW_URL} -e VULNERABILITY_FILE=vulnerability-report.json -v ${{ github.workspace }}:/app_origin ${SVIEW_IMAGE} python /app/pipeline.py "/app_origin/vulnerability-report.json"
+          docker run --rm -e MODIFIED_VALUES=${MODIFIED_VALUES} -e SVIEW_TOKEN=${{ secrets.SVIEW_TOKEN }} -e SVIEW_APP=${SVIEW_APP} -e SVIEW_URL=${SVIEW_URL} -e VULNERABILITY_FILE=vulnerability.json -v ${{ github.workspace }}:/app_origin ${SVIEW_IMAGE} python /app/pipeline.py "/app_origin/vulnerability.json"
