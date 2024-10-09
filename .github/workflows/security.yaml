@@ -25,12 +25,18 @@ on:
         description: 'Enable license scanning'
         required: false
         default: 'true'
+      continue_on_error:
+        type: boolean
+        description: 'Continue on error for license and security scan'
+        default: true
+        required: false
 
 jobs:
   security_scan:
     name: 🔐 Security Scan
     if: ${{ inputs.security_scan_enabled == 'true' }}
     runs-on: ubuntu-latest
+    continue-on-error: ${{ inputs.continue_on_error }}
     steps:
       - name: Download Docker Image
         uses: actions/download-artifact@v3
@@ -89,6 +95,7 @@ jobs:
     name: 📜 License Scan
     if: ${{ inputs.license_scan_enabled == 'true' }}
     runs-on: ubuntu-latest
+    continue-on-error: ${{ inputs.continue_on_error }}
     steps:
       - name: Download Docker Image
         uses: actions/download-artifact@v3
