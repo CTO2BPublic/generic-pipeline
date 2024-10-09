@@ -52,5 +52,5 @@ jobs:
       - name: Push Docker Image to ECR
         if: ${{ inputs.ecr_repository }}
         run: |
-          docker tag ${{ inputs.docker_image }}:${{ inputs.image_tag }} ${{ inputs.ecr_repository }}/${{ inputs.image_tag }}:${{ inputs.image_tag }}
-          docker push ${{ inputs.ecr_repository }}/${{ inputs.image_tag }}:${{ inputs.image_tag }}
+          docker tag ${{ inputs.docker_image }}:${{ inputs.image_tag }} ${{ inputs.ecr_repository }}/${{ inputs.docker_image }}:${{ inputs.image_tag }}
+          docker push ${{ inputs.ecr_repository }}/${{ inputs.docker_image }}:${{ inputs.image_tag }}
