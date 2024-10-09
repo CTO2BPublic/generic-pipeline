@@ -77,7 +77,7 @@ jobs:
         env:
           TRIVY_CACHE_DIR: '${{ github.workspace }}/.cache/trivy'
         run: |
-          ./trivy image --severity HIGH,CRITICAL --no-progress --format json -o vulnerability.json ${{ inputs.docker_image }}:${{ inputs.image_tag }}
+          ./trivy/trivy image --severity HIGH,CRITICAL --no-progress --format json -o vulnerability.json ${{ inputs.docker_image }}:${{ inputs.image_tag }}
 
       - name: Upload Vulnerability Report
         uses: actions/upload-artifact@v3
@@ -135,7 +135,7 @@ jobs:
         env:
           TRIVY_CACHE_DIR: '${{ github.workspace }}/.cache/trivy'
         run: |
-          ./trivy image --scanners license --severity UNKNOWN,HIGH,CRITICAL --no-progress --format json -o license.json ${{ inputs.docker_image }}:${{ inputs.image_tag }}
+          ./trivy/trivy image --scanners license --severity UNKNOWN,HIGH,CRITICAL --no-progress --format json -o license.json ${{ inputs.docker_image }}:${{ inputs.image_tag }}
 
       - name: Upload License Report
         uses: actions/upload-artifact@v3
