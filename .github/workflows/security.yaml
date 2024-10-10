@@ -2,7 +2,7 @@
 name: Security and License Scan
 
 env:
-  TRIVY_VERSION: 0.47.0
+  TRIVY_VERSION: 0.56.1
 
 on:
   workflow_call:
@@ -84,7 +84,7 @@ jobs:
         env:
           TRIVY_CACHE_DIR: '${{ github.workspace }}/.cache/trivy'
         run: |
-          ./trivy/trivy image --severity HIGH,CRITICAL --no-progress --format json -o vulnerability.json ${{ inputs.docker_image }}:${{ inputs.image_tag }}
+          ./trivy/trivy image --db-repository "public.ecr.aws/aquasecurity/trivy-db:2","ghcr.io/aquasecurity/trivy-db:2" --severity HIGH,CRITICAL --no-progress --format json -o vulnerability.json ${{ inputs.docker_image }}:${{ inputs.image_tag }}
 
       - name: Upload Vulnerability Report
         uses: actions/upload-artifact@v4
