@@ -16,10 +16,10 @@ on:
           description: 'GCR registry for publishing'
           required: true
 
-  secrets:
-    gcr_credentials:
-      description: 'GCP Service Account Key for GCR'
-      required: true
+    secrets:
+      gcr_credentials:
+        description: 'GCP Service Account Key for GCR'
+        required: true
 
 jobs:
   publish:
