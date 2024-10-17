@@ -1,0 +1,51 @@
+name: Publish Docker Image to GCR
+
+on:
+  workflow_call:
+    inputs:
+      docker_image:
+        type: string
+        description: 'Docker image name with tag for publishing'
+        required: true
+      image_tag:
+        type: string
+        description: 'Image tag for the Docker image'
+        required: true    
+      gcr_repository:
+          type: string
+          description: 'GCR registry for publishing'
+          required: true
+
+  secrets:
+    gcr_credentials:
+      description: 'GCP Service Account Key for GCR'
+      required: true
+
+jobs:
+  publish:
+    name: 🚀 Publish Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Docker Image
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+
+      - name: Load Docker Image
+        run: docker load -i "${{ inputs.docker_image}}.tar"
+
+      - name: Authenticate to GCP using Service Account Key
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.gcr_credentials }}
+          token_format: 'access_token'
+
+      - name: Auth to Google Artifact Registry
+        run: |-
+          echo '${{ steps.auth.outputs.access_token }}' там | docker login -u oauth2accesstoken --password-stdin https://${{ inputs.gcr_repository }}
+
+      - name: Tag and push Docker image to Google Artifact Registry
+        run: |
+          docker tag "${{ inputs.docker_image}}:${{ inputs.image_tag }} "${{ inputs.gcr_repository }}/${{ inputs.docker_image}}:${{ inputs.image_tag }}"
+          docker push "${{ inputs.gcr_repository }}/${{ inputs.docker_image}}:${{ inputs.image_tag }}

@@ -64,12 +64,4 @@ jobs:
       - name: Build Docker Image
         run: ${{ inputs.build_step }}
 
-      - name: Save Docker Image to Artifact
-        run: |
-          docker save ${{ inputs.docker_image }}:${{ inputs.image_tag }} -o myapp.tar
-        # Upload the Docker image tarball as an artifact
-      - name: Upload Docker Image Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: docker-image
-          path: myapp.tar
+

@@ -105,7 +105,7 @@ jobs:
           name: docker-image
 
       - name: Load Docker Image
-        run: docker load -i myapp.tar
+        run: docker load -i "${{ inputs.docker_image }}.tar"
 
       - name: Generate cache key for Trivy download
         id: cache-key
