@@ -1,6 +1,11 @@
 name: Image Version Generation
 
-on: workflow_call
+on:
+  workflow_call:
+    outputs:
+      image_version:
+        description: 'Generated image version'
+        value: ${{ jobs.GenerateImageVersion.outputs.image_version }}
 
 jobs:
   GenerateImageVersion:
