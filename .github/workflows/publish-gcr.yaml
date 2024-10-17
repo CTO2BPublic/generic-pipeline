@@ -43,7 +43,7 @@ jobs:
 
       - name: Auth to Google Artifact Registry
         run: |-
-          echo '${{ steps.auth.outputs.access_token }}' там | docker login -u oauth2accesstoken --password-stdin https://${{ inputs.gcr_repository }}
+          echo '${{ steps.auth.outputs.access_token }}' | docker login -u oauth2accesstoken --password-stdin https://${{ inputs.gcr_repository }}
 
       - name: Tag and push Docker image to Google Artifact Registry
         run: |
