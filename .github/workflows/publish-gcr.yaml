@@ -15,6 +15,14 @@ on:
           type: string
           description: 'GCR registry for publishing'
           required: true
+      gcp_project:
+          type: string
+          description: 'GCP project for GCR'
+          required: true
+      environment:
+          type: string
+          description: 'Environment for the deployment'
+          required: true
 
     secrets:
       gcr_credentials:
@@ -47,5 +55,5 @@ jobs:
 
       - name: Tag and push Docker image to Google Artifact Registry
         run: |
-          docker tag "${{ inputs.docker_image}}:${{ inputs.image_tag }} "${{ inputs.gcr_repository }}/${{ inputs.docker_image}}:${{ inputs.image_tag }}"
-          docker push "${{ inputs.gcr_repository }}/${{ inputs.docker_image}}:${{ inputs.image_tag }}
+          docker tag "${{ inputs.docker_image}}:${{ inputs.image_tag }} "${{ inputs.gcr_repository }}/${{ inputs.gcp_project }}/${{ inputs.environment }}/${{ inputs.docker_image}}:${{ inputs.image_tag }}"
+          docker push "${{ inputs.gcr_repository }}/${{ inputs.gcp_project }}/${{ inputs.environment }}/${{ inputs.docker_image}}:${{ inputs.image_tag }}
