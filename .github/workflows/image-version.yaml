@@ -26,7 +26,7 @@ jobs:
         id: set_image_version
         run: |
           if [ ! -z "${{ env.TAG }}" ]; then
-            echo "image_version=${{ env.TAG }}-${{ env.SHORT_SHA }}" >> $GITHUB_OUTPUT
+            echo "image_version=${{ env.TAG }}-${{ env.SHORT_SHA }}" >> "${GITHUB_OUTPUT}"
           else
-            echo "image_version=${{ env.SHORT_SHA }}" >> $GITHUB_OUTPUT
+            echo "image_version=${{ env.SHORT_SHA }}" >> "${GITHUB_OUTPUT}"
           fi
