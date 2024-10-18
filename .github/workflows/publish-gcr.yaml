@@ -56,4 +56,4 @@ jobs:
       - name: Tag and push Docker image to Google Artifact Registry
         run: |
           docker tag "${{ inputs.docker_image}}:${{ inputs.image_tag }} "${{ inputs.gcr_repository }}/${{ inputs.gcp_project }}/${{ inputs.environment }}/${{ inputs.docker_image}}:${{ inputs.image_tag }}"
-          docker push "${{ inputs.gcr_repository }}/${{ inputs.gcp_project }}/${{ inputs.environment }}/${{ inputs.docker_image}}:${{ inputs.image_tag }}
+          docker push "${{ inputs.gcr_repository }}/${{ inputs.gcp_project }}/${{ inputs.environment }}/${{ inputs.docker_image}}:${{ inputs.image_tag }}"
