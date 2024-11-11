@@ -2,13 +2,10 @@ name: Image Version Generation
 
 on:
   workflow_call:
-<<<<<<< HEAD
     inputs:
       IMAGE_TAG_FORMAT:
         required: false
         type: string
-=======
->>>>>>> master
     outputs:
       image_version:
         description: 'Generated image version'
