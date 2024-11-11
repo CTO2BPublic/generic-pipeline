@@ -34,10 +34,10 @@ jobs:
       - name: 🏷 Set image version
         id: set_image_version
         run: |
-          if [ ! -z "${{ env.TAG }}" ]; then
-            echo "image_version=${{ env.TAG }}-${{ env.SHORT_SHA }}" >> "${GITHUB_OUTPUT}"
-          elseif [ ! -z "${{ inputs.IMAGE_TAG_FORMAT }}" ]; then
+          if [ ! -z "${{ inputs.IMAGE_TAG_FORMAT }}" ]; then
             echo "image_version=${{ inputs.IMAGE_TAG_FORMAT }}" >> "${GITHUB_OUTPUT}"
+          elseifif [ ! -z "${{ env.TAG }}" ]; then
+            echo "image_version=${{ env.TAG }}-${{ env.SHORT_SHA }}" >> "${GITHUB_OUTPUT}"
           else
             echo "image_version=${{ env.SHORT_SHA }}" >> "${GITHUB_OUTPUT}"
           fi
