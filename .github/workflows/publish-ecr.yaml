@@ -40,7 +40,7 @@ jobs:
           name: docker-image
 
       - name: Load Docker Image
-        run: docker load -i myapp.tar
+        run: docker load -i "${{ inputs.docker_image }}.tar"
 
       - name: Configure AWS for ECR
         if: ${{ inputs.ecr_repository }}
