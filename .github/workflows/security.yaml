@@ -20,6 +20,11 @@ on:
         description: 'Enable security scanning'
         required: false
         default: 'true'
+      timeout:
+        type: string
+        description: 'Timeout for the scan'
+        required: false
+        default: '5m'
       license_scan_enabled:
         type: string
         description: 'Enable license scanning'
@@ -84,7 +89,7 @@ jobs:
         env:
           TRIVY_CACHE_DIR: '${{ github.workspace }}/.cache/trivy'
         run: |
-          ./trivy/trivy image --db-repository "public.ecr.aws/aquasecurity/trivy-db:2","ghcr.io/aquasecurity/trivy-db:2" --java-db-repository "public.ecr.aws/aquasecurity/trivy-java-db:1","ghcr.io/aquasecurity/trivy-java-db:1" --severity HIGH,CRITICAL --no-progress --format json -o vulnerability.json ${{ inputs.docker_image }}:${{ inputs.image_tag }}
+          ./trivy/trivy image --timeout ${{ inputs.timeout }} --db-repository "public.ecr.aws/aquasecurity/trivy-db:2","ghcr.io/aquasecurity/trivy-db:2" --java-db-repository "public.ecr.aws/aquasecurity/trivy-java-db:1","ghcr.io/aquasecurity/trivy-java-db:1" --severity HIGH,CRITICAL --no-progress --format json -o vulnerability.json ${{ inputs.docker_image }}:${{ inputs.image_tag }}
 
       - name: Upload Vulnerability Report
         uses: actions/upload-artifact@v4
@@ -145,7 +150,7 @@ jobs:
         env:
           TRIVY_CACHE_DIR: '${{ github.workspace }}/.cache/trivy'
         run: |
-          ./trivy/trivy image --scanners license --severity UNKNOWN,HIGH,CRITICAL --no-progress --format json -o license.json ${{ inputs.docker_image }}:${{ inputs.image_tag }}
+          ./trivy/trivy image --scanners license --severity UNKNOWN,HIGH,CRITICAL --no-progress --format json --timeout ${{ inputs.timeout }} -o license.json ${{ inputs.docker_image }}:${{ inputs.image_tag }}
 
       - name: Upload License Report
         uses: actions/upload-artifact@v4
