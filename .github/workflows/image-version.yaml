@@ -2,6 +2,10 @@ name: Image Version Generation
 
 on:
   workflow_call:
+    inputs:
+      IMAGE_TAG_FORMAT:
+        required: false
+        type: string
     outputs:
       image_version:
         description: 'Generated image version'
@@ -30,7 +34,9 @@ jobs:
       - name: 🏷 Set image version
         id: set_image_version
         run: |
-          if [ ! -z "${{ env.TAG }}" ]; then
+          if [ ! -z "${{ github.event.inputs.IMAGE_TAG_FORMAT }}" ]; then
+            echo "image_version=${{ github.event.inputs.IMAGE_TAG_FORMAT }}" >> "${GITHUB_OUTPUT}"
+          elif [ ! -z "${{ env.TAG }}" ]; then
             echo "image_version=${{ env.TAG }}-${{ env.SHORT_SHA }}" >> "${GITHUB_OUTPUT}"
           else
             echo "image_version=${{ env.SHORT_SHA }}" >> "${GITHUB_OUTPUT}"
