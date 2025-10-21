@@ -2,6 +2,11 @@ name: Image Version Generation
 
 on:
   workflow_call:
+    inputs:
+      tag_script:
+        description: 'Optional bash script to extract custom tag (script should echo the tag)'
+        required: false
+        type: string
     outputs:
       image_version:
         description: 'Generated image version'
@@ -18,6 +23,13 @@ jobs:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v3
 
+      - name: 🎯 Extract tag from custom script
+        id: custom_tag
+        if: inputs.tag_script != ''
+        run: |
+          CUSTOM_TAG=$(bash -c "${{ inputs.tag_script }}")
+          echo "CUSTOM_TAG=${CUSTOM_TAG}" >> $GITHUB_ENV
+
       - name: 🏷 Extract tag
         id: extract_tag
         run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
@@ -30,7 +42,9 @@ jobs:
       - name: 🏷 Set image version
         id: set_image_version
         run: |
-          if [ ! -z "${{ env.TAG }}" ]; then
+          if [ ! -z "${{ env.CUSTOM_TAG }}" ]; then
+            echo "image_version=${{ env.CUSTOM_TAG }}-${{ env.SHORT_SHA }}" >> "${GITHUB_OUTPUT}"
+          elif [ ! -z "${{ env.TAG }}" ]; then
             echo "image_version=${{ env.TAG }}-${{ env.SHORT_SHA }}" >> "${GITHUB_OUTPUT}"
           else
             echo "image_version=${{ env.SHORT_SHA }}" >> "${GITHUB_OUTPUT}"
