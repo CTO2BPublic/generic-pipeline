@@ -11,6 +11,11 @@ on:
         type: string
         description: 'Docker image name with tag for scanning'
         required: true
+      image_name:
+        type: string
+        description: 'Docker image name during the export step'
+        default: ''
+        required: false
       image_tag:
         type: string
         description: 'Image tag for the Docker image'
@@ -49,7 +54,11 @@ jobs:
           name: docker-image
 
       - name: Load Docker Image
-        run: docker load -i "${{ inputs.docker_image }}.tar"
+        run: |
+            docker load -i "${{ inputs.docker_image }}.tar"
+            if [ ! -z "${{ inputs.image_name }}" ]; then
+                docker tag ${{ inputs.image_name }}:${{ inputs.image_tag }} ${{ inputs.docker_image }}:${{ inputs.image_tag }}
+            fi
 
       - name: Generate cache key for Trivy download
         id: cache-key
@@ -110,7 +119,11 @@ jobs:
           name: docker-image
 
       - name: Load Docker Image
-        run: docker load -i "${{ inputs.docker_image }}.tar"
+        run: |
+            docker load -i "${{ inputs.docker_image }}.tar"
+            if [ ! -z "${{ inputs.image_name }}" ]; then
+                docker tag ${{ inputs.image_name }}:${{ inputs.image_tag }} ${{ inputs.docker_image }}:${{ inputs.image_tag }}
+            fi
 
       - name: Generate cache key for Trivy download
         id: cache-key
