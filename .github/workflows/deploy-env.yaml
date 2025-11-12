@@ -24,6 +24,11 @@ on:
         type: string
         description: 'SVIEW URL'
         required: true
+      artifact_name:
+        type: string
+        description: 'Name of the artifact containing the Docker image tar file'
+        default: 'docker-image'
+        required: false
     secrets:
       sview_token:
         description: 'SVIEW token'
@@ -39,7 +44,7 @@ jobs:
         uses: actions/download-artifact@v4
         continue-on-error: true
         with:
-          name: vulnerability-report
+          name: ${{ inputs.artifact_name == 'docker-image' && 'vulnerability-report' || format('vulnerability-report-{0}', inputs.artifact_name) }}
           path: .
 
       - name: Tag SVIEW
