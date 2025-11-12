@@ -40,6 +40,11 @@ on:
         description: 'Continue on error for license and security scan'
         default: true
         required: false
+      artifact_name:
+        type: string
+        description: 'Name of the artifact containing the Docker image tar file'
+        default: 'docker-image'
+        required: false
 
 jobs:
   security_scan:
@@ -51,7 +56,7 @@ jobs:
       - name: Download Docker Image
         uses: actions/download-artifact@v4
         with:
-          name: docker-image
+          name: ${{ inputs.artifact_name }}
 
       - name: Load Docker Image
         run: |
@@ -116,7 +121,7 @@ jobs:
       - name: Download Docker Image
         uses: actions/download-artifact@v4
         with:
-          name: docker-image
+          name: ${{ inputs.artifact_name }}
 
       - name: Load Docker Image
         run: |
