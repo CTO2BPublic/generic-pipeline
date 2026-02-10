@@ -53,6 +53,8 @@ jobs:
         run: |
           echo "SVIEW_IMAGE=${SVIEW_IMAGE}" # Debugging line
           echo "MODIFIED_VALUES=${MODIFIED_VALUES}" # Debugging line
+          echo "SVIEW_APP=${SVIEW_APP}" # Debugging line
+          echo "SVIEW_URL=${SVIEW_URL}" # Debugging line
           if [[ ! -f "./vulnerability.json" ]]; then
             echo "Vulnerability file not found"
             touch "./vulnerability.json"
