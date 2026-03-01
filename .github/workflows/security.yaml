@@ -108,7 +108,7 @@ jobs:
       - name: Upload Vulnerability Report
         uses: actions/upload-artifact@v4
         with:
-          name: vulnerability-report
+          name: ${{ inputs.artifact_name == 'docker-image' && 'vulnerability-report' || format('vulnerability-report-{0}', inputs.artifact_name) }}
           path: vulnerability.json
           retention-days: 5
 
@@ -173,7 +173,7 @@ jobs:
       - name: Upload License Report
         uses: actions/upload-artifact@v4
         with:
-          name: license-report
+          name: ${{ inputs.artifact_name == 'docker-image' && 'license-report' || format('license-report-{0}', inputs.artifact_name) }}
           path: license.json
           retention-days: 5
   
