@@ -1,8 +1,8 @@
-# .github/workflows/security.yml
+# .github/workflows/security.yaml
 name: Security and License Scan
 
 env:
-  TRIVY_VERSION: 0.56.1
+  TRIVY_VERSION: "0.69.2"
 
 on:
   workflow_call:
@@ -72,7 +72,7 @@ jobs:
 
       - name: Restore Trivy from cache
         id: cache-trivy
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: trivy
           key: ${{ env.trivy-cache-key }}
@@ -80,17 +80,21 @@ jobs:
       - name: Download Trivy if not cached
         if: steps.cache-trivy.outputs.cache-hit != 'true'
         run: |
-          wget https://github.com/aquasecurity/trivy/releases/download/v${{ env.TRIVY_VERSION }}/trivy_${{ env.TRIVY_VERSION }}_Linux-64bit.tar.gz -O trivy.tar.gz
+          wget "https://github.com/aquasecurity/trivy/releases/download/v${{ env.TRIVY_VERSION }}/trivy_${{ env.TRIVY_VERSION }}_Linux-64bit.tar.gz" -O trivy.tar.gz
           mkdir -p trivy
           mv trivy.tar.gz trivy/
           cd trivy && tar zxvf trivy.tar.gz
 
       - name: Cache Trivy after download
         if: steps.cache-trivy.outputs.cache-hit != 'true'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: trivy
           key: ${{ env.trivy-cache-key }}
+
+      - name: Set date for cache key
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
       - name: Restore DB from cache
         uses: actions/cache@v4
@@ -137,7 +141,7 @@ jobs:
 
       - name: Restore Trivy from cache
         id: cache-trivy
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: trivy
           key: ${{ env.trivy-cache-key }}
@@ -145,7 +149,7 @@ jobs:
       - name: Download Trivy if not cached
         if: steps.cache-trivy.outputs.cache-hit != 'true'
         run: |
-          wget https://github.com/aquasecurity/trivy/releases/download/v${{ env.TRIVY_VERSION }}/trivy_${{ env.TRIVY_VERSION }}_Linux-64bit.tar.gz -O trivy.tar.gz
+          wget "https://github.com/aquasecurity/trivy/releases/download/v${{ env.TRIVY_VERSION }}/trivy_${{ env.TRIVY_VERSION }}_Linux-64bit.tar.gz" -O trivy.tar.gz
           mkdir -p trivy
           mv trivy.tar.gz trivy/
           cd trivy && tar zxvf trivy.tar.gz
@@ -156,6 +160,10 @@ jobs:
         with:
           path: trivy
           key: ${{ env.trivy-cache-key }}
+
+      - name: Set date for cache key
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
       - name: Restore DB from cache
         uses: actions/cache@v4
