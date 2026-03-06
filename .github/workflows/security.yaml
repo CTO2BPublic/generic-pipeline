@@ -75,8 +75,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: trivy
-          key: ${{ env.trivy-cache-key }}
-
+          key: trivy-${{ inputs.trivy_version }}
+          
       - name: Download Trivy if not cached
         if: steps.cache-trivy.outputs.cache-hit != 'true'
         run: |
