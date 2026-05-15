@@ -23,6 +23,11 @@ on:
           type: string
           description: 'Environment for the deployment'
           required: true
+      artifact_name:
+          type: string
+          description: 'Name of the artifact containing the Docker image'
+          required: false
+          default: 'docker-image'
 
     secrets:
       gcr_credentials:
@@ -35,9 +40,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Docker Image
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
-          name: docker-image
+          name: ${{ inputs.artifact_name }}
 
       - name: Load Docker Image
         run: docker load -i "${{ inputs.docker_image}}.tar"
