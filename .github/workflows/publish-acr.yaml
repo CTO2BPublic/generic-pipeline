@@ -1,0 +1,53 @@
+name: Publish Docker Image to ACR
+
+on:
+  workflow_call:
+    inputs:
+      docker_image:
+        type: string
+        description: 'Docker image name with tag for publishing'
+        required: true
+      image_tag:
+        type: string
+        description: 'Image tag for the Docker image'
+        required: true
+      acr_repository:
+        type: string
+        description: 'ACR repository for publishing'
+        required: false
+      artifact_name:
+        type: string
+        description: 'Name of the artifact containing the Docker image'
+        required: false
+        default: 'docker-image'
+    secrets:
+      acr_username:
+        description: 'Azure ACR username for publishing'
+        required: false
+      acr_password:
+        description: 'Azure ACR password for publishing'
+        required: false
+
+jobs:
+  publish:
+    name: Publish Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Docker Image
+        uses: actions/download-artifact@v6
+        with:
+          name: ${{ inputs.artifact_name }}
+
+      - name: Load Docker Image
+        run: docker load -i "${{ inputs.docker_image }}.tar"
+
+      - name: Configure Azure for ACR
+        if: ${{ inputs.acr_repository }}
+        run: |
+          echo "${{ secrets.acr_password }}" | docker login --username ${{ secrets.acr_username }} --password-stdin ${{ inputs.acr_repository }}
+
+      - name: Push Docker Image to ACR
+        if: ${{ inputs.acr_repository }}
+        run: |
+          docker tag ${{ inputs.docker_image }}:${{ inputs.image_tag }} ${{ inputs.acr_repository }}/${{ inputs.docker_image }}:${{ inputs.image_tag }}
+          docker push ${{ inputs.acr_repository }}/${{ inputs.docker_image }}:${{ inputs.image_tag }}
