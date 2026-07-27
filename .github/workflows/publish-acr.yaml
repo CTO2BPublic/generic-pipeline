@@ -30,7 +30,7 @@ on:
 
 jobs:
   publish:
-    name: 🚀 Publish Docker Image
+    name: Publish Docker Image
     runs-on: ubuntu-latest
     steps:
       - name: Download Docker Image
