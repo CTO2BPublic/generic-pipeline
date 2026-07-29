@@ -77,7 +77,6 @@ jobs:
 
       - name: Save Docker Image to Artifact
         run: |
-          mkdir -p "$(dirname "${{ inputs.docker_image }}.tar")"
           docker save ${{ inputs.docker_image }}:${{ inputs.image_tag }} -o ${{ inputs.docker_image }}.tar
         # Upload the Docker image tarball as an artifact
       - name: Upload Docker Image Artifact

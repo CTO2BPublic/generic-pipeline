@@ -20,6 +20,10 @@ on:
         description: 'Name of the artifact containing the Docker image'
         required: false
         default: 'docker-image'
+      acr_image_name:
+        type: string
+        description: 'Image path to push to ACR under, if different from docker_image (e.g. a namespaced path like portalpro/admin-fe-test). Defaults to docker_image.'
+        required: false
       azure_client_id:
         type: string
         description: 'Client ID of the Azure AD App Registration federated for OIDC login'
@@ -68,5 +72,8 @@ jobs:
       - name: Push Docker Image to ACR
         if: ${{ inputs.acr_repository }}
         run: |
-          docker tag ${{ inputs.docker_image }}:${{ inputs.image_tag }} ${{ inputs.acr_repository }}/${{ inputs.docker_image }}:${{ inputs.image_tag }}
-          docker push ${{ inputs.acr_repository }}/${{ inputs.docker_image }}:${{ inputs.image_tag }}
+          PUSH_NAME="${ACR_IMAGE_NAME:-${{ inputs.docker_image }}}"
+          docker tag ${{ inputs.docker_image }}:${{ inputs.image_tag }} ${{ inputs.acr_repository }}/$PUSH_NAME:${{ inputs.image_tag }}
+          docker push ${{ inputs.acr_repository }}/$PUSH_NAME:${{ inputs.image_tag }}
+        env:
+          ACR_IMAGE_NAME: ${{ inputs.acr_image_name }}
