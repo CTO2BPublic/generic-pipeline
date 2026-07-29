@@ -32,6 +32,10 @@ on:
         description: 'Name of the artifact to upload the Docker image'
         required: false
         default: 'docker-image'
+    secrets:
+      build_secret:
+        description: 'Optional secret exposed as $BUILD_SECRET env var during the build step (e.g. a PAT for private package installs)'
+        required: false
 
 jobs:
   lint:
@@ -67,6 +71,8 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Build Docker Image
+        env:
+          BUILD_SECRET: ${{ secrets.build_secret }}
         run: ${{ inputs.build_step }}
 
       - name: Save Docker Image to Artifact
