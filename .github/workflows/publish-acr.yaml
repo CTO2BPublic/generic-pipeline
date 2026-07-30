@@ -13,20 +13,33 @@ on:
         required: true
       acr_repository:
         type: string
-        description: 'ACR repository for publishing'
+        description: 'ACR repository for publishing (e.g. myregistry.azurecr.io)'
         required: false
       artifact_name:
         type: string
         description: 'Name of the artifact containing the Docker image'
         required: false
         default: 'docker-image'
-    secrets:
-      acr_username:
-        description: 'Azure ACR username for publishing'
+      acr_image_name:
+        type: string
+        description: 'Image path to push to ACR under, if different from docker_image (e.g. a namespaced path like portalpro/admin-fe-test). Defaults to docker_image.'
         required: false
-      acr_password:
-        description: 'Azure ACR password for publishing'
+      azure_client_id:
+        type: string
+        description: 'Client ID of the Azure AD App Registration federated for OIDC login'
         required: false
+      azure_tenant_id:
+        type: string
+        description: 'Azure AD tenant ID that owns the ACR'
+        required: false
+      azure_subscription_id:
+        type: string
+        description: 'Azure subscription ID that owns the ACR'
+        required: false
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   publish:
@@ -39,15 +52,28 @@ jobs:
           name: ${{ inputs.artifact_name }}
 
       - name: Load Docker Image
-        run: docker load -i "${{ inputs.docker_image }}.tar"
+        run: docker load -i "$(basename "${{ inputs.docker_image }}").tar"
 
-      - name: Configure Azure for ACR
+      - name: Azure login (OIDC)
+        if: ${{ inputs.acr_repository }}
+        uses: azure/login@v2
+        with:
+          client-id: ${{ inputs.azure_client_id }}
+          tenant-id: ${{ inputs.azure_tenant_id }}
+          subscription-id: ${{ inputs.azure_subscription_id }}
+
+      - name: Login to ACR
         if: ${{ inputs.acr_repository }}
         run: |
-          echo "${{ secrets.acr_password }}" | docker login --username ${{ secrets.acr_username }} --password-stdin ${{ inputs.acr_repository }}
+          az acr login --name "${ACR_REPOSITORY%%.*}"
+        env:
+          ACR_REPOSITORY: ${{ inputs.acr_repository }}
 
       - name: Push Docker Image to ACR
         if: ${{ inputs.acr_repository }}
         run: |
-          docker tag ${{ inputs.docker_image }}:${{ inputs.image_tag }} ${{ inputs.acr_repository }}/${{ inputs.docker_image }}:${{ inputs.image_tag }}
-          docker push ${{ inputs.acr_repository }}/${{ inputs.docker_image }}:${{ inputs.image_tag }}
+          PUSH_NAME="${ACR_IMAGE_NAME:-${{ inputs.docker_image }}}"
+          docker tag ${{ inputs.docker_image }}:${{ inputs.image_tag }} ${{ inputs.acr_repository }}/$PUSH_NAME:${{ inputs.image_tag }}
+          docker push ${{ inputs.acr_repository }}/$PUSH_NAME:${{ inputs.image_tag }}
+        env:
+          ACR_IMAGE_NAME: ${{ inputs.acr_image_name }}
