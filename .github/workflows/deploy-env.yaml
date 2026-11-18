@@ -3,7 +3,7 @@ name: Deploy Image Tag to SVIEW
 run-name: Deploy Image Tag to SVIEW for ${{ inputs.sview_app }}
 
 env:
-  SVIEW_TAG_VERSION: v0.0.5-13-ge0ef33b
+  SVIEW_TAG_VERSION: v0.0.6
 
 on:
   workflow_call:
