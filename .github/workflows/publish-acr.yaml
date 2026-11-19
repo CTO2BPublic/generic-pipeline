@@ -24,6 +24,11 @@ on:
         type: string
         description: 'Image path to push to ACR under, if different from docker_image (e.g. a namespaced path like portalpro/admin-fe-test). Defaults to docker_image.'
         required: false
+      job_timeout_minutes:
+        type: number
+        description: 'Job timeout in minutes'
+        required: false
+        default: 20
     secrets:
       azure_client_id:
         description: 'Client ID of the Azure AD App Registration federated for OIDC login'
@@ -43,9 +48,11 @@ jobs:
   publish:
     name: Publish Docker Image
     runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.job_timeout_minutes }}
     steps:
       - name: Download Docker Image
         uses: actions/download-artifact@v6
+        timeout-minutes: 10
         with:
           name: ${{ inputs.artifact_name }}
 

@@ -26,6 +26,11 @@ on:
         description: 'Name of the artifact containing the Docker image'
         required: false
         default: 'docker-image'
+      job_timeout_minutes:
+        type: number
+        description: 'Job timeout in minutes'
+        required: false
+        default: 20
     secrets:
       ecr_aws_access_key_id:
         description: 'AWS access key for ECR publishing'
@@ -38,9 +43,11 @@ jobs:
   publish:
     name: 🚀 Publish Docker Image
     runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.job_timeout_minutes }}
     steps:
       - name: Download Docker Image
         uses: actions/download-artifact@v6
+        timeout-minutes: 10
         with:
           name: ${{ inputs.artifact_name }}
 
