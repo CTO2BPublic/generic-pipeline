@@ -7,6 +7,11 @@ on:
         description: 'Optional bash script to extract custom tag (script should echo the tag)'
         required: false
         type: string
+      job_timeout_minutes:
+        type: number
+        description: 'Job timeout in minutes'
+        required: false
+        default: 5
     outputs:
       image_version:
         description: 'Generated image version'
@@ -16,6 +21,7 @@ jobs:
   GenerateImageVersion:
     name: 🏷 Generate Image Version
     runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.job_timeout_minutes }}
     outputs:
       image_version: ${{ steps.set_image_version.outputs.image_version }}
 

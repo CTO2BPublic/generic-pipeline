@@ -2,7 +2,7 @@
 name: Security and License Scan
 
 env:
-  TRIVY_VERSION: "0.69.2"
+  TRIVY_VERSION: "0.76.2"
 
 on:
   workflow_call:
@@ -45,16 +45,23 @@ on:
         description: 'Name of the artifact containing the Docker image tar file'
         default: 'docker-image'
         required: false
+      job_timeout_minutes:
+        type: number
+        description: 'Job timeout in minutes'
+        required: false
+        default: 30
 
 jobs:
   security_scan:
     name: 🔐 Security Scan
     if: ${{ inputs.security_scan_enabled == 'true' }}
     runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.job_timeout_minutes }}
     continue-on-error: ${{ inputs.continue_on_error }}
     steps:
       - name: Download Docker Image
         uses: actions/download-artifact@v6
+        timeout-minutes: 10
         with:
           name: ${{ inputs.artifact_name }}
 
@@ -75,7 +82,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: trivy
-          key: trivy-${{ inputs.trivy_version }}
+          key: ${{ env.trivy-cache-key }}
           
       - name: Download Trivy if not cached
         if: steps.cache-trivy.outputs.cache-hit != 'true'
@@ -111,6 +118,7 @@ jobs:
 
       - name: Upload Vulnerability Report
         uses: actions/upload-artifact@v6
+        timeout-minutes: 10
         with:
           name: vulnerability-report
           path: vulnerability.json
@@ -120,10 +128,12 @@ jobs:
     name: 📜 License Scan
     if: ${{ inputs.license_scan_enabled == 'true' }}
     runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.job_timeout_minutes }}
     continue-on-error: ${{ inputs.continue_on_error }}
     steps:
       - name: Download Docker Image
         uses: actions/download-artifact@v6
+        timeout-minutes: 10
         with:
           name: ${{ inputs.artifact_name }}
 
@@ -180,6 +190,7 @@ jobs:
 
       - name: Upload License Report
         uses: actions/upload-artifact@v6
+        timeout-minutes: 10
         with:
           name: license-report
           path: license.json
@@ -188,6 +199,7 @@ jobs:
   mock_step:
     name: Mock Step
     runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.job_timeout_minutes }}
     steps:
       - name: Mock Step
         run: echo "Mock step to success Security ${{ inputs.docker_image }}:${{ inputs.image_tag }}!"

@@ -32,6 +32,11 @@ on:
         description: 'Name of the artifact to upload the Docker image'
         required: false
         default: 'docker-image'
+      job_timeout_minutes:
+        type: number
+        description: 'Job timeout in minutes'
+        required: false
+        default: 60
     secrets:
       build_secret:
         description: 'Optional secret exposed as $BUILD_SECRET env var during the build step (e.g. a PAT for private package installs)'
@@ -41,6 +46,7 @@ jobs:
   lint:
     name: 🔍 Lint Code
     runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.job_timeout_minutes }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5
@@ -51,6 +57,7 @@ jobs:
   test:
     name: 🧪 Run Tests
     runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.job_timeout_minutes }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5
@@ -61,6 +68,7 @@ jobs:
   build:
     name: 🛠 Build Docker Image
     runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.job_timeout_minutes }}
     needs: [lint, test]
     services:
       docker:
@@ -81,6 +89,7 @@ jobs:
         # Upload the Docker image tarball as an artifact
       - name: Upload Docker Image Artifact
         uses: actions/upload-artifact@v6
+        timeout-minutes: 10
         with:
           name: ${{ inputs.artifact_name }}
           path: ${{ inputs.docker_image }}.tar

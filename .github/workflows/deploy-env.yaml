@@ -24,6 +24,11 @@ on:
         type: string
         description: 'SVIEW URL'
         required: true
+      job_timeout_minutes:
+        type: number
+        description: 'Job timeout in minutes'
+        required: false
+        default: 10
     secrets:
       sview_token:
         description: 'SVIEW token'
@@ -33,10 +38,12 @@ jobs:
   tag_sview:
     name: 🚀 Tag SVIEW
     runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.job_timeout_minutes }}
     steps:
 
       - name: Download vulnerability report
         uses: actions/download-artifact@v6
+        timeout-minutes: 10
         continue-on-error: true
         with:
           name: vulnerability-report
